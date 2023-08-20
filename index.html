@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  .contain {
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  /* Common button styles */
+  .button {
+    font-size: 20px;
+    padding: 10px;
+    margin: 10px;
+    height: auto;
+    flex: 1; /* Distribute the available space evenly among the buttons */
+    max-width: calc(33.33% - 20px); /* Limit the maximum width for each button */
+  }
+
+  /* Flexbox container for the buttons */
+  .button-container {
+    display: flex;
+    justify-content: space-between; /* Distribute the buttons with equal space between them */
+    max-width: 630px; /* Limit the maximum width for the button container */
+    margin: 0 auto; /* Center the button container horizontally */
+    text-align: left; /* Align the buttons to the left */
+  }
+</style>
+
+<!-- Add no-cache directives -->
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="expires" content="0">
+<meta http-equiv="pragma" content="no-cache">
+
+</head>
+<body>
+  <div id="imageContainer">
+    <!-- Images will be loaded here -->
+  </div>
+
+  <!-- Flexbox container for the buttons -->
+  <div class="button-container">
+    <!-- Three buttons in the same line -->
+    <button id="reverseButton" class="button" onclick="reverseAnimation()">Reverse</button>
+    <button id="forwardButton" class="button" onclick="forwardAnimation()">Forward</button>
+    <button class="button" onclick="refreshPage()">Refresh</button>
+  </div>
+
+  <script>
+    // Image URLs array in reverse order
+    var imageUrls = [
+      "https://imdhyderabad.gov.in/radar/MAX25_GHMC/MAX25_GHMC_10.gif",
+      "https://imdhyderabad.gov.in/radar/MAX25_GHMC/MAX25_GHMC_9.gif",
+      "https://imdhyderabad.gov.in/radar/MAX25_GHMC/MAX25_GHMC_8.gif",
+      "https://imdhyderabad.gov.in/radar/MAX25_GHMC/MAX25_GHMC_7.gif",
+      "https://imdhyderabad.gov.in/radar/MAX25_GHMC/MAX25_GHMC_6.gif",
+      "https://imdhyderabad.gov.in/radar/MAX25_GHMC/MAX25_GHMC_5.gif",
+      "https://imdhyderabad.gov.in/radar/MAX25_GHMC/MAX25_GHMC_4.gif",
+      "https://imdhyderabad.gov.in/radar/MAX25_GHMC/MAX25_GHMC_3.gif",
+      "https://imdhyderabad.gov.in/radar/MAX25_GHMC/MAX25_GHMC_2.gif",
+      "https://imdhyderabad.gov.in/radar/MAX25_GHMC/MAX25_GHMC_1.gif"
+    ];
+
+    var currentIndex = 0; // Current image index
+    var container = document.getElementById("imageContainer");
+    var img = new Image();
+    var animationTimeout; // Variable to store the animation timeout
+
+    function updateImage() {
+      img.classList.add("contain");
+      img.src = imageUrls[currentIndex];
+      container.innerHTML = ''; // Clear previous image
+      container.appendChild(img);
+    }
+
+    function vibratePattern(pattern) {
+      if (navigator.vibrate) {
+        navigator.vibrate(pattern);
+      }
+    }
+
+    function forwardAnimation() {
+      currentIndex = (currentIndex + 1) % imageUrls.length;
+      updateImage();
+
+      // Enable the "Reverse" button
+      document.getElementById("reverseButton").disabled = false;
+
+      // Disable the "Forward" button if the currentIndex is the last index
+      if (currentIndex === imageUrls.length - 1) {
+        document.getElementById("forwardButton").disabled = true;
+      }
+
+      // Vibrate for 50 milliseconds when the "Forward" button is clicked
+      vibratePattern([50]);
+    }
+
+    function reverseAnimation() {
+      currentIndex = (currentIndex - 1 + imageUrls.length) % imageUrls.length;
+      updateImage();
+
+      // Enable the "Forward" button
+      document.getElementById("forwardButton").disabled = false;
+
+      // Disable the "Reverse" button if the currentIndex is the first index
+      if (currentIndex === 0) {
+        document.getElementById("reverseButton").disabled = true;
+      }
+
+      // Vibrate for 50 milliseconds when the "Reverse" button is clicked
+      vibratePattern([50]);
+    }
+
+    function animateImages() {
+      if (currentIndex >= imageUrls.length) {
+        clearTimeout(animationTimeout);
+        document.getElementById("forwardButton").disabled = true; // Disable the "Forward" button
+        return; // Stop the animation if the currentIndex exceeds the last index
+      }
+
+      updateImage();
+      currentIndex++;
+      if (currentIndex === imageUrls.length) {
+        clearTimeout(animationTimeout);
+        document.getElementById("forwardButton").disabled = true; // Disable the "Forward" button
+        return; // Stop the animation if the currentIndex reaches the last index
+      }
+      animationTimeout = setTimeout(animateImages, 2000); // Load the next image after 2 seconds
+    }
+
+    // Preload all images
+    imageUrls.forEach(function (url) {
+      var image = new Image();
+      image.src = url;
+    });
+
+    // Start loading the first image and animate when the page is ready
+    document.addEventListener("DOMContentLoaded", function () {
+      animateImages();
+    });
+
+    function refreshPage() {
+      // Vibrate for 50 milliseconds when the "Refresh" button is clicked
+      vibratePattern([50]);
+
+      location.reload();
+    }
+  </script>
+</body>
+</html>
